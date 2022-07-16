@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32630.192
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MicroApplicationFramework", "MicroApplicationFramework\MicroApplicationFramework.csproj", "{4C2AD016-1E03-4B98-89F2-16831F719A3F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MicroApplicationFrameworkExample", "MicroApplicationFrameworkExample\MicroApplicationFrameworkExample.csproj", "{8713CCE1-3907-4742-8748-BCA11303BF8D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4C2AD016-1E03-4B98-89F2-16831F719A3F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C2AD016-1E03-4B98-89F2-16831F719A3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C2AD016-1E03-4B98-89F2-16831F719A3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C2AD016-1E03-4B98-89F2-16831F719A3F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8713CCE1-3907-4742-8748-BCA11303BF8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8713CCE1-3907-4742-8748-BCA11303BF8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8713CCE1-3907-4742-8748-BCA11303BF8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8713CCE1-3907-4742-8748-BCA11303BF8D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {12EF50BA-1D21-4E92-AAE4-098B0A65530A}
+	EndGlobalSection
+EndGlobal

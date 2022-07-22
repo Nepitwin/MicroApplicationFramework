@@ -5,9 +5,25 @@ namespace MicroApplicationFramework
 {
     public abstract class Application : IApplication
     {
-        public abstract void OnRegister(IContainer container);
-        public abstract void OnInit(IContainer container);
-        public abstract void OnExecute();
-        public abstract void OnExit();
+        protected IApplicationContext ApplicationContext = null!;
+
+        public virtual void OnRegister(IContainer container)
+        {
+            container.Register<IApplicationContext, ApplicationContext>(Reuse.Singleton);
+        }
+
+        public virtual void OnInit(IContainer container)
+        {
+            ApplicationContext = container.Resolve<IApplicationContext>();
+        }
+
+        public virtual void OnExecute()
+        {
+            ApplicationContext.RequestCancel();
+        }
+
+        public virtual void OnExit()
+        {
+        }
     }
 }

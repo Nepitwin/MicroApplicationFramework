@@ -14,13 +14,14 @@ public class Bootstrapper
     public Bootstrapper(IApplication application)
     {
         _application = application;
-        InitContext();
     }
 
     public void Run()
     {
         _application.OnRegister(_container);
         _application.OnInit(_container);
+        InitContext();
+        _container.Resolve<IApplicationContext>();
         _application.OnExecute();
         while (!_cancellationToken.IsCancellationRequested)
         {
@@ -30,7 +31,6 @@ public class Bootstrapper
     }
     private void InitContext()
     {
-        _container.Register<IApplicationContext, ApplicationContext>(Reuse.Singleton);
         var context = _container.Resolve<IApplicationContext>();
         context.CancelEvent += OnCancelRequested;
     }

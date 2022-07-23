@@ -60,9 +60,9 @@ public class App : Application
         _module.Foo();
         _moduleB.Bar();
 
-        Task.Factory.StartNew(() =>
+        Task.Run(async delegate
         {
-            Thread.Sleep(Convert.ToInt32(TimeSpan.FromSeconds(5).TotalMilliseconds));
+            await Task.Delay(Convert.ToInt32(TimeSpan.FromSeconds(5).TotalMilliseconds));
             ApplicationContext.RequestCancel();
         });
     }

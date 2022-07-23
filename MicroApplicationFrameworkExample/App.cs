@@ -36,9 +36,9 @@ public class App : Application
 
         // Application will not be automatically shutdown if OnExecute will be exited for async tasks executions
         // Developer can decide to shutdown application by execution request cancel method from Application context...
-        Task.Factory.StartNew(() =>
+        Task.Run(async delegate
         {
-            Thread.Sleep(Convert.ToInt32(TimeSpan.FromSeconds(5).TotalMilliseconds));
+            await Task.Delay(Convert.ToInt32(TimeSpan.FromSeconds(5).TotalMilliseconds));
             ApplicationContext.RequestCancel();
         });
     }

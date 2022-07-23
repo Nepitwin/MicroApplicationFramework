@@ -21,11 +21,11 @@ public class Bootstrapper
         _application.OnRegister(_container);
         _application.OnInit(_container);
         InitContext();
-        _container.Resolve<IApplicationContext>();
         _application.OnExecute();
         _cancellationToken.Token.WaitHandle.WaitOne();
         _application.OnExit();
     }
+
     private void InitContext()
     {
         var context = _container.Resolve<IApplicationContext>();

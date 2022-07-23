@@ -18,4 +18,10 @@ public class Module : IModule
     {
         Console.WriteLine("Foo");
     }
+
+    public void Init()
+    {
+        Console.WriteLine("Init");
+    }
+
 }

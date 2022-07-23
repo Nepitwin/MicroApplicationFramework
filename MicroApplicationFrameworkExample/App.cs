@@ -7,9 +7,6 @@ namespace MicroApplicationFrameworkExample;
 
 public class App : Application
 {
-    private IModule _module = null!;
-    private IModuleB _moduleB = null!;
-
     public override void OnRegister(IContainer container)
     {
         base.OnRegister(container);
@@ -22,17 +19,23 @@ public class App : Application
     {
         base.OnInit(container);
         Console.WriteLine("OnInit");
-        _module = container.Resolve<IModule>();
-        _moduleB = container.Resolve<IModuleB>();
+        // If a init method is needed
+        container.Resolve<IModule>().Init();
+        container.Resolve<IModuleB>().Init();
     }
 
     public override void OnExecute(IContainer container)
     {
         Console.WriteLine("OnExecute");
 
+        // By default all registered object dependency will be resolved by all registered object by on register
+        // Inversion of control handles object management
+        var module = container.Resolve<IModule>();
+        var moduleB = container.Resolve<IModuleB>();
+
         // Write your logic code here ...
-        _module.Foo();
-        _moduleB.Bar();
+        module.Foo();
+        moduleB.Bar();
 
         // Application will not be automatically shutdown if OnExecute will be exited for async tasks executions
         // Developer can decide to shutdown application by execution request cancel method from Application context...

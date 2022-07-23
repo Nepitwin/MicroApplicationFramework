@@ -21,9 +21,9 @@ public class Bootstrapper
         _application.OnRegister(_container);
         _application.OnInit(_container);
         InitContext();
-        _application.OnExecute();
+        _application.OnExecute(_container);
         _cancellationToken.Token.WaitHandle.WaitOne();
-        _application.OnExit();
+        _application.OnExit(_container);
     }
 
     private void InitContext()

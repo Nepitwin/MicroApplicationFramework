@@ -11,8 +11,8 @@ Executed lifecycle from a application are:
 
 1. OnRegister(IContainer container) - Registration from all all modules.
 2. OnInit(IContainer container)     - Module initialization.
-3. OnExecute() - Execution method which guarantees an pre initialization and registration.
-4. OnExit() - Exit request to dispose or cleanup all modules.
+3. OnExecute(IContainer container) - Execution method which guarantees an pre initialization and registration.
+4. OnExit(IContainer container) - Exit request to dispose or cleanup all modules.
 
 ## Interfaces
 
@@ -53,7 +53,7 @@ public class App : Application
         _moduleB = container.Resolve<IModuleB>();
     }
 
-    public override void OnExecute()
+    public override void OnExecute(IContainer container)
     {
         Console.WriteLine("OnExecute");
 
@@ -68,7 +68,7 @@ public class App : Application
         });
     }
 
-    public override void OnExit()
+    public override void OnExit(IContainer container)
     {
         Console.WriteLine("OnExit");
     }
@@ -81,7 +81,7 @@ Application execution will not be automatically shutdown if OnExecute is exited 
 Developers can decide to shutdown application by a simple RequestCancel execution from ApplicationContext
 
 ```
-public override void OnExecute()
+public override void OnExecute(IContainer container)
 {
     // Logic code here
     //...
@@ -94,7 +94,7 @@ public override void OnExecute()
 If no async tasks are needed simple call base.OnExecute() for an ApplicationContext.RequestCancel().
 
 ```
-public override void OnExecute()
+public override void OnExecute(IContainer container)
 {
     Console.WriteLine("OnExecute");
     base.OnExecute();

@@ -17,12 +17,12 @@ namespace MicroApplicationFramework
             ApplicationContext = container.Resolve<IApplicationContext>();
         }
 
-        public virtual void OnExecute()
+        public virtual void OnExecute(IContainer container)
         {
             ApplicationContext.RequestCancel();
         }
 
-        public virtual void OnExit()
+        public virtual void OnExit(IContainer container)
         {
         }
     }

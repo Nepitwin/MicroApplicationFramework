@@ -26,7 +26,7 @@ public class App : Application
         _moduleB = container.Resolve<IModuleB>();
     }
 
-    public override void OnExecute()
+    public override void OnExecute(IContainer container)
     {
         Console.WriteLine("OnExecute");
 
@@ -43,9 +43,9 @@ public class App : Application
         });
     }
 
-    public override void OnExit()
+    public override void OnExit(IContainer container)
     {
         Console.WriteLine("OnExit");
-        base.OnExit();
+        base.OnExit(container);
     }
 }

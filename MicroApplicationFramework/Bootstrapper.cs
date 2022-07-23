@@ -23,10 +23,7 @@ public class Bootstrapper
         InitContext();
         _container.Resolve<IApplicationContext>();
         _application.OnExecute();
-        while (!_cancellationToken.IsCancellationRequested)
-        {
-            Thread.Sleep(1000);
-        }
+        _cancellationToken.Token.WaitHandle.WaitOne();
         _application.OnExit();
     }
     private void InitContext()

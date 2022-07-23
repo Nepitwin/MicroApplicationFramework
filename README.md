@@ -2,16 +2,17 @@
 
 MAF is a container based library to quickly build small service applications.
 
-MAF uses the DryIoc container as a dependency injection framework.
+* MAF uses the DryIoc container as a dependency injection framework.
+* MAF guarantees a simple lifecycle to manage all modules.
 
 ## Lifecycle
 
 Executed lifecycle from a application are:
 
-1. OnRegister(Icontainer container) - Register all your Interfaces
-2. OnInit(Icontainer container)     - Initialize all modules if needed
-3. OnExecute() - Execution method which guarantees all initialization and registration from modules are finished.
-4. OnExit() - Exit requested to dispose or cleanup all services if needed
+1. OnRegister(IContainer container) - Registration from all all modules.
+2. OnInit(IContainer container)     - Module initialization.
+3. OnExecute() - Execution method which guarantees an pre initialization and registration.
+4. OnExit() - Exit request to dispose or cleanup all modules.
 
 ## Interfaces
 

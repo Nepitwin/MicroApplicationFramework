@@ -17,9 +17,4 @@ public class ModuleB : IModuleB
         _module.Foo();
         Console.WriteLine("Bar");
     }
-
-    public void Init()
-    {
-        Console.WriteLine("Init");
-    }
 }

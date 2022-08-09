@@ -5,7 +5,6 @@ namespace MicroApplicationFrameworkExample.Service;
 
 public class Module : IModule
 {
-
     private IApplicationContext _context;
 
     public Module(IApplicationContext context)
@@ -18,10 +17,4 @@ public class Module : IModule
     {
         Console.WriteLine("Foo");
     }
-
-    public void Init()
-    {
-        Console.WriteLine("Init");
-    }
-
 }

@@ -1,4 +1,5 @@
 ﻿using MicroApplicationFramework.Interface;
+using Serilog;
 
 namespace MicroApplicationFramework;
 
@@ -31,15 +32,26 @@ public class Bootstrapper
 
             while (tasks.Length > 0)
             {
-                _cts = new CancellationTokenSource();
                 _application.ApplicationContext.TaskScheduler.Clear();
                 Task.WaitAll(tasks, _cts.Token);
                 tasks = _application.ApplicationContext.TaskScheduler.GetScheduledTasks();
             }
         }
-        catch (Exception)
+        catch (AggregateException aggregateException)
+        {
+            Log.Warning("The following exceptions have been thrown:");
+            foreach (var ex in aggregateException.InnerExceptions)
+            {
+                Log.Warning(ex, ex.ToString());
+            }
+        }
+        catch (OperationCanceledException ex)
+        {
+            Log.Information(ex,"Operation was cancelled by application");
+        }
+        catch (Exception ex)
         { 
-            // Ignored
+            Log.Warning(ex,"Exception called");
         }
         finally
         {

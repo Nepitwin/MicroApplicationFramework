@@ -43,7 +43,6 @@ namespace MicroApplicationFrameworkTests
 
         public override void OnExecute()
         {
-
             ApplicationContext.TaskScheduler.Add(Task.Run(async () =>
             {
                 await Task.Delay(2000);

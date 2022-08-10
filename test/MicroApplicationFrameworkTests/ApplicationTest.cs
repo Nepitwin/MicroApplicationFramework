@@ -44,7 +44,7 @@ namespace MicroApplicationFrameworkTests
         public override void OnExecute()
         {
 
-            ApplicationContext.Tasks.Add(Task.Run(async () =>
+            ApplicationContext.TaskScheduler.Add(Task.Run(async () =>
             {
                 await Task.Delay(2000);
                 IsTaskExecuted = true;
@@ -145,6 +145,15 @@ namespace MicroApplicationFrameworkTests
 
             bootstrapper.Run();
             application.IsTaskExecuted.Should().BeFalse();
+        }
+
+        [Fact]
+        public void AsyncApplicationWaitsUntilAllTasksAreFinished()
+        {
+            var application = new AsyncTestApplication();
+            var bootstrapper = Bootstrapper.Create(application);
+            bootstrapper.Run();
+            application.IsTaskExecuted.Should().BeTrue();
         }
     }
 }

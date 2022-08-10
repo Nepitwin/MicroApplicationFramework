@@ -1,11 +1,10 @@
-﻿using System.Collections.Concurrent;
-using MicroApplicationFramework.Interface;
+﻿using MicroApplicationFramework.Interface;
 
 namespace MicroApplicationFramework;
 
 public class ApplicationContext : IApplicationContext
 {
-    public ConcurrentBag<Task> Tasks { get; } = new();
+    public ITaskScheduler TaskScheduler { get; } = new ApplicationTaskScheduler();
 
     public event IApplicationContext.CancelEventHandler CancelEvent = null!;
 

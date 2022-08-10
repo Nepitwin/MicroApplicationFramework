@@ -64,7 +64,7 @@ public class App : Application
 ### Async
 
 If you want to run multiple tasks in the background you can access them via the ApplicationContext and register individual tasks seperatly.
-The application now waits until all tasks are completed or the cancel event has been called by the ApplicationContext.
+The application waits until all tasks are completed or the cancel event has been called.
 
 ```
 public class AsyncApp: Application
@@ -85,20 +85,20 @@ public class AsyncApp: Application
     {
         Console.WriteLine("OnExecute");
 
-        ApplicationContext.Tasks.Add(Task.Run(async () =>
+        ApplicationContext.TaskScheduler.Add(Task.Run(async () =>
         {
             await Task.Delay(10000);
             Console.WriteLine("Delayed Task Foo");
             var module = Container.Resolve<IModule>();
             module.Foo();
 
-            ApplicationContext.Tasks.Add(Task.Run(() =>
+            ApplicationContext.TaskScheduler.Add(Task.Run(() =>
             {
                 Console.WriteLine("Extend additional tasks if needed.");
             }));
         }));
 
-        ApplicationContext.Tasks.Add(Task.Run(async () =>
+        ApplicationContext.TaskScheduler.Add(Task.Run(async () =>
         {
             await Task.Delay(8000);
             Console.WriteLine("Delayed Task Bar");

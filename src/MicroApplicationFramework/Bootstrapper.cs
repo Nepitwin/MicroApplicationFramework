@@ -26,12 +26,15 @@ public class Bootstrapper
             _application.OnRegister();
             _application.OnInit();
             _application.OnExecute();
-            while (_application.ApplicationContext.Tasks.Count > 0)
+
+            var tasks = _application.ApplicationContext.TaskScheduler.GetScheduledTasks();
+
+            while (tasks.Length > 0)
             {
                 _cts = new CancellationTokenSource();
-                var tasksArray = _application.ApplicationContext.Tasks.ToArray();
-                _application.ApplicationContext.Tasks.Clear();
-                Task.WaitAll(tasksArray, _cts.Token);
+                _application.ApplicationContext.TaskScheduler.Clear();
+                Task.WaitAll(tasks, _cts.Token);
+                tasks = _application.ApplicationContext.TaskScheduler.GetScheduledTasks();
             }
         }
         catch (Exception)

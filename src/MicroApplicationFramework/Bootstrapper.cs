@@ -27,11 +27,11 @@ public class Bootstrapper
             _application.OnRegister();
             _application.OnInit();
             _application.OnExecute();
-            var tasks = _application.ApplicationContext.TaskScheduler.ConsumeAllTasks();
+            var tasks = _application.ApplicationContext.TaskCollector.ConsumeAllTasks();
             while (tasks.Length > 0)
             {
                 Task.WaitAll(tasks, _cts.Token);
-                tasks = _application.ApplicationContext.TaskScheduler.ConsumeAllTasks();
+                tasks = _application.ApplicationContext.TaskCollector.ConsumeAllTasks();
             }
         }
         catch (AggregateException aggregateException)

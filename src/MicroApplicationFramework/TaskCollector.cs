@@ -1,14 +1,13 @@
-﻿using System.Collections.Concurrent;
-using MicroApplicationFramework.Interface;
+﻿using MicroApplicationFramework.Interface;
 
 namespace MicroApplicationFramework;
 
-public class ApplicationTaskScheduler : ITaskScheduler
+public class TaskCollector : ITaskCollector
 {
     private static readonly Mutex Mutex = new();
     private readonly List<Task> _tasksCollection = new();
     
-    Task[] ITaskScheduler.ConsumeAllTasks()
+    Task[] ITaskCollector.ConsumeAllTasks()
     {
         Mutex.WaitOne();
         var array = _tasksCollection.ToArray();

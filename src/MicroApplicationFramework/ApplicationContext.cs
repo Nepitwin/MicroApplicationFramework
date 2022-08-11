@@ -4,7 +4,7 @@ namespace MicroApplicationFramework;
 
 public class ApplicationContext : IApplicationContext
 {
-    public ITaskScheduler TaskScheduler { get; } = new ApplicationTaskScheduler();
+    public ITaskCollector TaskCollector { get; } = new TaskCollector();
 
     public event IApplicationContext.CancelEventHandler CancelEvent = null!;
 

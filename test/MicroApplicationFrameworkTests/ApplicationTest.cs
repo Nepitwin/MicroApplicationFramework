@@ -45,10 +45,10 @@ namespace MicroApplicationFrameworkTests
 
         public override void OnExecute()
         {
-            ApplicationContext.TaskScheduler.Produce(Task.Run(async () =>
+            ApplicationContext.TaskCollector.Produce(Task.Run(async () =>
             {
                 await Task.Delay(500);
-                ApplicationContext.TaskScheduler.Produce(Task.Run(async () =>
+                ApplicationContext.TaskCollector.Produce(Task.Run(async () =>
                 {
                     await Task.Delay(500);
                     IsTaskExecuted = true;
@@ -78,13 +78,13 @@ namespace MicroApplicationFrameworkTests
 
         public override void OnExecute()
         {
-            ApplicationContext.TaskScheduler.Produce(Task.Run(async () =>
+            ApplicationContext.TaskCollector.Produce(Task.Run(async () =>
             {
                 await Task.Delay(2000);
                 IsTaskExecuted = true;
             }));
 
-            ApplicationContext.TaskScheduler.Produce(Task.Run(() => throw new Exception("My Task is called a unhandled Exception")));
+            ApplicationContext.TaskCollector.Produce(Task.Run(() => throw new Exception("My Task is called a unhandled Exception")));
         }
 
         public override void OnExit()

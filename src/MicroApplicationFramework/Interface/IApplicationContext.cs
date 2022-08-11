@@ -2,7 +2,7 @@
 
 public interface IApplicationContext
 {
-    ITaskScheduler TaskScheduler { get; }
+    ITaskCollector TaskCollector { get; }
 
     delegate void CancelEventHandler();
     event CancelEventHandler CancelEvent;

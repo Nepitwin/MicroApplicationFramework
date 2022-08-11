@@ -1,6 +1,6 @@
 ﻿namespace MicroApplicationFramework.Interface;
 
-public interface ITaskScheduler
+public interface ITaskCollector
 { 
     public void Produce(Task task);
     

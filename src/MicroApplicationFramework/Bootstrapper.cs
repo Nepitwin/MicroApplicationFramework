@@ -39,7 +39,7 @@ public class Bootstrapper
         }
         catch (AggregateException aggregateException)
         {
-            Log.Warning("The following exceptions have been thrown:");
+            Log.Warning("The following exceptions have been thrown");
             foreach (var ex in aggregateException.InnerExceptions)
             {
                 Log.Warning(ex, ex.ToString());

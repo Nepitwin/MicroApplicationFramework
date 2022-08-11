@@ -6,24 +6,18 @@ namespace MicroApplicationFramework;
 public class ApplicationTaskScheduler : ITaskScheduler
 {
     private static readonly Mutex Mutex = new();
-    private readonly ConcurrentBag<Task> _tasksCollection = new();
-
-    public void Clear()
-    {
-        Mutex.WaitOne();
-        _tasksCollection.Clear();
-        Mutex.ReleaseMutex();
-    }
-
-    public Task[] GetScheduledTasks()
+    private readonly List<Task> _tasksCollection = new();
+    
+    Task[] ITaskScheduler.ConsumeAllTasks()
     {
         Mutex.WaitOne();
         var array = _tasksCollection.ToArray();
+        _tasksCollection.Clear();
         Mutex.ReleaseMutex();
         return array;
     }
-
-    public void Add(Task task)
+    
+    public void Produce(Task task)
     {
         Mutex.WaitOne();
         _tasksCollection.Add(task);

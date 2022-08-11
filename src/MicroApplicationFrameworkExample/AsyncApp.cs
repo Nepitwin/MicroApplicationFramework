@@ -23,20 +23,20 @@ public class AsyncApp: Application
     {
         Console.WriteLine("OnExecute");
 
-        ApplicationContext.TaskScheduler.Add(Task.Run(async () =>
+        ApplicationContext.TaskScheduler.Produce(Task.Run(async () =>
         {
             await Task.Delay(10000);
             Console.WriteLine("Delayed Task Foo");
             var module = Container.Resolve<IModule>();
             module.Foo();
 
-            ApplicationContext.TaskScheduler.Add(Task.Run(() =>
+            ApplicationContext.TaskScheduler.Produce(Task.Run(() =>
             {
                 Console.WriteLine("Extend additional tasks if needed.");
             }));
         }));
 
-        ApplicationContext.TaskScheduler.Add(Task.Run(async () =>
+        ApplicationContext.TaskScheduler.Produce(Task.Run(async () =>
         {
             await Task.Delay(8000);
             Console.WriteLine("Delayed Task Bar");

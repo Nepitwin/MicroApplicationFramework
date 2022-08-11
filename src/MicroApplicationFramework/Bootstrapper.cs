@@ -5,7 +5,7 @@ namespace MicroApplicationFramework;
 
 public class Bootstrapper
 {
-    private CancellationTokenSource _cts = new();
+    private readonly CancellationTokenSource _cts = new();
 
     private readonly IApplication _application;
 
@@ -27,14 +27,11 @@ public class Bootstrapper
             _application.OnRegister();
             _application.OnInit();
             _application.OnExecute();
-
-            var tasks = _application.ApplicationContext.TaskScheduler.GetScheduledTasks();
-
+            var tasks = _application.ApplicationContext.TaskScheduler.ConsumeAllTasks();
             while (tasks.Length > 0)
             {
-                _application.ApplicationContext.TaskScheduler.Clear();
                 Task.WaitAll(tasks, _cts.Token);
-                tasks = _application.ApplicationContext.TaskScheduler.GetScheduledTasks();
+                tasks = _application.ApplicationContext.TaskScheduler.ConsumeAllTasks();
             }
         }
         catch (AggregateException aggregateException)

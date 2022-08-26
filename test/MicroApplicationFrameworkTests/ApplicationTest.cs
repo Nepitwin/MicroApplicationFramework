@@ -20,7 +20,7 @@ namespace MicroApplicationFrameworkTests
 
         public override void OnExecute()
         {
-            // Ignored
+            ApplicationContext.RequestCancel();
         }
 
         public override void OnExit()
@@ -29,10 +29,8 @@ namespace MicroApplicationFrameworkTests
         }
     }
 
-    public class AsyncTestApplication : Application
+    public class NoRequestCancelApplication : Application
     {
-        public bool IsTaskExecuted { get; set; }
-
         public override void OnRegister()
         {
             // Ignored
@@ -45,46 +43,7 @@ namespace MicroApplicationFrameworkTests
 
         public override void OnExecute()
         {
-            ApplicationContext.TaskCollector.Produce(Task.Run(async () =>
-            {
-                await Task.Delay(500);
-                ApplicationContext.TaskCollector.Produce(Task.Run(async () =>
-                {
-                    await Task.Delay(500);
-                    IsTaskExecuted = true;
-                }));
-            }));
-        }
-
-        public override void OnExit()
-        {
             // Ignored
-        }
-    }
-
-    public class AsyncExceptionTestApplication : Application
-    {
-        public bool IsTaskExecuted { get; set; }
-
-        public override void OnRegister()
-        {
-            // Ignored
-        }
-
-        public override void OnInit()
-        {
-            // Ignored
-        }
-
-        public override void OnExecute()
-        {
-            ApplicationContext.TaskCollector.Produce(Task.Run(async () =>
-            {
-                await Task.Delay(2000);
-                IsTaskExecuted = true;
-            }));
-
-            ApplicationContext.TaskCollector.Produce(Task.Run(() => throw new Exception("My Task is called a unhandled Exception")));
         }
 
         public override void OnExit()
@@ -98,7 +57,10 @@ namespace MicroApplicationFrameworkTests
         [Fact]
         public void ApplicationShouldExecuteAllLifeCycleMethodsOnce()
         {
-            var mockApplication = new Mock<TestApplication>();
+            var mockApplication = new Mock<TestApplication>
+            {
+                CallBase = true
+            };
             using (InitLoggerContext())
             {
                 Bootstrapper.Create(mockApplication.Object).Run();
@@ -115,6 +77,7 @@ namespace MicroApplicationFrameworkTests
         {
             var mockApplication = new Mock<TestApplication>();
             mockApplication.Setup(app => app.OnRegister()).Throws(new Exception("Any Exception By Init"));
+            mockApplication.CallBase = true;
 
             using (InitLoggerContext())
             {
@@ -135,6 +98,7 @@ namespace MicroApplicationFrameworkTests
         {
             var mockApplication = new Mock<TestApplication>();
             mockApplication.Setup(app => app.OnInit()).Throws(new Exception("Any Exception By Init"));
+            mockApplication.CallBase = true;
 
             using (InitLoggerContext())
             {
@@ -155,6 +119,7 @@ namespace MicroApplicationFrameworkTests
         {
             var mockApplication = new Mock<TestApplication>();
             mockApplication.Setup(app => app.OnExecute()).Throws(new Exception("Any Exception By Init"));
+            mockApplication.CallBase = true;
 
             using (InitLoggerContext())
             {
@@ -171,78 +136,18 @@ namespace MicroApplicationFrameworkTests
         }
 
         [Fact]
-        public void AsyncApplicationShouldCleanExitIfApplicationContextRequestCancelIsCalled()
+        public void TimeoutIsCalledIfReached()
         {
+            var mockApplication = new NoRequestCancelApplication();
+            mockApplication.ApplicationContext.Timeout = 5000;
+
             using (InitLoggerContext())
             {
-                var application = new AsyncTestApplication();
-                var bootstrapper = Bootstrapper.Create(application);
-
-                Task.Run(async () =>
-                {
-                    await Task.Delay(500);
-                    application.ApplicationContext.RequestCancel();
-                });
-
-                bootstrapper.Run();
-                application.IsTaskExecuted.Should().BeFalse();
+                Bootstrapper.Create(mockApplication).Run();
                 TestCorrelator.GetLogEventsFromCurrentContext()
                     .Should().ContainSingle()
                     .Which.MessageTemplate.Text
-                    .Should().Be("Operation was cancelled by application");
-            }
-        }
-
-        [Fact]
-        public void AsyncApplicationMultipleApplicationContextRequestCancelShouldDoNothing()
-        {
-            using (InitLoggerContext())
-            {
-                var application = new AsyncTestApplication();
-                var bootstrapper = Bootstrapper.Create(application);
-
-                Task.Run(async () =>
-                {
-                    await Task.Delay(500);
-                    application.ApplicationContext.RequestCancel();
-                    application.ApplicationContext.RequestCancel();
-                });
-
-                bootstrapper.Run();
-                application.IsTaskExecuted.Should().BeFalse();
-                TestCorrelator.GetLogEventsFromCurrentContext()
-                    .Should().ContainSingle()
-                    .Which.MessageTemplate.Text
-                    .Should().Be("Operation was cancelled by application");
-            }
-        }
-
-        [Fact]
-        public void AsyncApplicationWaitsUntilAllTasksAreFinished()
-        {
-            using (InitLoggerContext())
-            {
-                var application = new AsyncTestApplication();
-                var bootstrapper = Bootstrapper.Create(application);
-                bootstrapper.Run();
-                application.IsTaskExecuted.Should().BeTrue();
-                TestCorrelator.GetLogEventsFromCurrentContext().Should().BeEmpty();
-            }
-        }
-
-        [Fact]
-        public void UnhandledTaskExceptionWillBeCaughtByBootstrapperAndLogged()
-        {
-            using (InitLoggerContext())
-            {
-                var application = new AsyncExceptionTestApplication();
-                var bootstrapper = Bootstrapper.Create(application);
-                bootstrapper.Run();
-                application.IsTaskExecuted.Should().BeTrue();
-
-                TestCorrelator.GetLogEventsFromCurrentContext().Should().HaveCount(2);
-                TestCorrelator.GetLogEventsFromCurrentContext().Should().Contain(log => log.MessageTemplate.Text.Equals("The following exceptions have been thrown"));
-                TestCorrelator.GetLogEventsFromCurrentContext().Should().Contain(log => (log.Exception != null));
+                    .Should().Be("Timeout reached...application will be canceled");
             }
         }
 

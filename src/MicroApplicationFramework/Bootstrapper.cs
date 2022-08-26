@@ -27,24 +27,12 @@ public class Bootstrapper
             _application.OnRegister();
             _application.OnInit();
             _application.OnExecute();
-            var tasks = _application.ApplicationContext.TaskCollector.ConsumeAllTasks();
-            while (tasks.Length > 0)
+            _cts.Token.WaitHandle.WaitOne(_application.ApplicationContext.Timeout);
+            if (!_cts.IsCancellationRequested)
             {
-                Task.WaitAll(tasks, _cts.Token);
-                tasks = _application.ApplicationContext.TaskCollector.ConsumeAllTasks();
+                _cts.Cancel();
+                Log.Warning("Timeout reached...application will be canceled");
             }
-        }
-        catch (AggregateException aggregateException)
-        {
-            Log.Warning("The following exceptions have been thrown");
-            foreach (var ex in aggregateException.InnerExceptions)
-            {
-                Log.Warning(ex, ex.ToString());
-            }
-        }
-        catch (OperationCanceledException ex)
-        {
-            Log.Information(ex,"Operation was cancelled by application");
         }
         catch (Exception ex)
         { 
@@ -63,11 +51,6 @@ public class Bootstrapper
 
     private void OnCancelRequested()
     {
-        if (_cts.IsCancellationRequested)
-        {
-            return;
-        }
-
         _cts.Cancel();
     }
 }

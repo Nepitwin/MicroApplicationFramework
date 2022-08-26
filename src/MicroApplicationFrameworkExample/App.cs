@@ -21,13 +21,22 @@ public class App : Application
 
     public override void OnExecute()
     {
-        Console.WriteLine("OnExecute");
-        var module = Container.Resolve<IModule>();
-        var moduleB = Container.Resolve<IModuleB>();
+        try
+        {
+            Console.WriteLine("OnExecute");
+            var module = Container.Resolve<IModule>();
+            var moduleB = Container.Resolve<IModuleB>();
 
-        // Write your logic code here ...
-        module.Foo();
-        moduleB.Bar();
+            // Write your logic code here ...
+            module.Foo();
+            moduleB.Bar();
+        }
+        finally
+        {
+            // Application should be canceled if on execute is finished
+            // If method will not be called a default timeout by 5 minutes will stop the application afterwards.
+            ApplicationContext.RequestCancel();
+        }
     }
 
     public override void OnExit()

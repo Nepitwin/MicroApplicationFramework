@@ -2,10 +2,8 @@
 
 public interface IApplicationContext
 {
-    ITaskCollector TaskCollector { get; }
-
     delegate void CancelEventHandler();
     event CancelEventHandler CancelEvent;
-
+    int Timeout { get; set; }
     void RequestCancel();
 }

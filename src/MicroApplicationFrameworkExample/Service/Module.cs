@@ -5,12 +5,9 @@ namespace MicroApplicationFrameworkExample.Service;
 
 public class Module : IModule
 {
-    private IApplicationContext _context;
-
-    public Module(IApplicationContext context)
+    public Module()
     {
         Console.WriteLine("Module INIT");
-        _context = context;
     }
 
     public void Foo()

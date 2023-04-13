@@ -6,13 +6,10 @@ namespace MicroApplicationFramework
     public abstract class Application : IApplication
     {
         public IContainer Container { get; }
-        public IApplicationContext ApplicationContext { get; }
 
         protected Application()
         {
             Container = new Container();
-            Container.Register<IApplicationContext, ApplicationContext>(Reuse.Singleton);
-            ApplicationContext = Container.Resolve<IApplicationContext>();
         }
 
         public virtual void OnRegister()

@@ -15,9 +15,30 @@ namespace MicroApplicationFramework
             ApplicationContext = Container.Resolve<IApplicationContext>();
         }
 
-        public abstract void OnRegister();
-        public abstract void OnInit();
-        public abstract void OnExecute();
-        public abstract void OnExit();
+        public virtual void OnRegister()
+        {
+            // Ignored
+        }
+
+        public virtual void OnInit()
+        {
+            // Ignored
+        }
+
+        public virtual void OnExecute()
+        {
+            // Ignored
+        }
+
+        public virtual Task OnExecuteAsync()
+        {
+            // Ignored
+            return Task.Run(() => {});
+        }
+
+        public virtual void OnExit()
+        {
+            // Ignored
+        }
     }
 }

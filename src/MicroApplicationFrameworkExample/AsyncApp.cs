@@ -5,7 +5,7 @@ using MicroApplicationFrameworkExample.Service;
 
 namespace MicroApplicationFrameworkExample;
 
-public class App : Application
+public class AsyncApp: Application
 {
     public override void OnRegister()
     {
@@ -21,17 +21,21 @@ public class App : Application
         Console.WriteLine("OnInit");
     }
 
-    public override void OnExecute()
+    public override Task OnExecuteAsync()
     {
-        base.OnExecute();
-        
-        Console.WriteLine("OnExecute");
-        var module = Container.Resolve<IModule>();
-        var moduleB = Container.Resolve<IModuleB>();
+        Console.WriteLine("OnExecuteAsync");
+        return Task.Run(async () =>
+        {
+            var module = Container.Resolve<IModule>();
+            var moduleB = Container.Resolve<IModuleB>();
 
-        // Write your logic code here ...
-        module.Foo();
-        moduleB.Bar();
+            // Write your async logic code here ...
+            module.Foo();
+            await Task.Delay(2500);
+            moduleB.Bar();
+
+            // OnExit will be called if all task is finished
+        });
     }
 
     public override void OnExit()

@@ -20,29 +20,6 @@ namespace MicroApplicationFrameworkTests
 
         public override void OnExecute()
         {
-            ApplicationContext.RequestCancel();
-        }
-
-        public override void OnExit()
-        {
-            // Ignored
-        }
-    }
-
-    public class NoRequestCancelApplication : Application
-    {
-        public override void OnRegister()
-        {
-            // Ignored
-        }
-
-        public override void OnInit()
-        {
-            // Ignored
-        }
-
-        public override void OnExecute()
-        {
             // Ignored
         }
 
@@ -51,7 +28,7 @@ namespace MicroApplicationFrameworkTests
             // Ignored
         }
     }
-
+    
     public class ApplicationTest
     {
         [Fact]
@@ -67,6 +44,7 @@ namespace MicroApplicationFrameworkTests
                 mockApplication.Verify(app => app.OnInit(), Times.Once);
                 mockApplication.Verify(app => app.OnRegister(), Times.Once);
                 mockApplication.Verify(app => app.OnExecute(), Times.Once);
+                mockApplication.Verify(app => app.OnExecuteAsync(), Times.Once);
                 mockApplication.Verify(app => app.OnExit(), Times.Once);
                 TestCorrelator.GetLogEventsFromCurrentContext().Should().BeEmpty();
             }
@@ -85,6 +63,7 @@ namespace MicroApplicationFrameworkTests
                 mockApplication.Verify(app => app.OnRegister(), Times.Once);
                 mockApplication.Verify(app => app.OnInit(), Times.Never);
                 mockApplication.Verify(app => app.OnExecute(), Times.Never);
+                mockApplication.Verify(app => app.OnExecuteAsync(), Times.Never);
                 mockApplication.Verify(app => app.OnExit(), Times.Once);
                 TestCorrelator.GetLogEventsFromCurrentContext()
                     .Should().ContainSingle()
@@ -106,6 +85,7 @@ namespace MicroApplicationFrameworkTests
                 mockApplication.Verify(app => app.OnRegister(), Times.Once);
                 mockApplication.Verify(app => app.OnInit(), Times.Once);
                 mockApplication.Verify(app => app.OnExecute(), Times.Never);
+                mockApplication.Verify(app => app.OnExecuteAsync(), Times.Never);
                 mockApplication.Verify(app => app.OnExit(), Times.Once);
                 TestCorrelator.GetLogEventsFromCurrentContext()
                     .Should().ContainSingle()
@@ -127,6 +107,7 @@ namespace MicroApplicationFrameworkTests
                 mockApplication.Verify(app => app.OnRegister(), Times.Once);
                 mockApplication.Verify(app => app.OnInit(), Times.Once);
                 mockApplication.Verify(app => app.OnExecute(), Times.Once);
+                mockApplication.Verify(app => app.OnExecuteAsync(), Times.Never);
                 mockApplication.Verify(app => app.OnExit(), Times.Once);
                 TestCorrelator.GetLogEventsFromCurrentContext()
                     .Should().ContainSingle()
@@ -134,20 +115,26 @@ namespace MicroApplicationFrameworkTests
                     .Should().Be("Exception called");
             }
         }
-
+        
         [Fact]
-        public void TimeoutIsCalledIfReached()
+        public void OnExitIsAlwaysCalledFromApplicationIfOnExecuteAsyncThrowsException()
         {
-            var mockApplication = new NoRequestCancelApplication();
-            mockApplication.ApplicationContext.Timeout = 5000;
+            var mockApplication = new Mock<TestApplication>();
+            mockApplication.Setup(app => app.OnExecuteAsync()).Throws(new Exception("Any Exception By Init"));
+            mockApplication.CallBase = true;
 
             using (InitLoggerContext())
             {
-                Bootstrapper.Create(mockApplication).Run();
+                Bootstrapper.Create(mockApplication.Object).Run();
+                mockApplication.Verify(app => app.OnRegister(), Times.Once);
+                mockApplication.Verify(app => app.OnInit(), Times.Once);
+                mockApplication.Verify(app => app.OnExecute(), Times.Once);
+                mockApplication.Verify(app => app.OnExecuteAsync(), Times.Once);
+                mockApplication.Verify(app => app.OnExit(), Times.Once);
                 TestCorrelator.GetLogEventsFromCurrentContext()
                     .Should().ContainSingle()
                     .Which.MessageTemplate.Text
-                    .Should().Be("Timeout reached...application will be canceled");
+                    .Should().Be("Exception called");
             }
         }
 

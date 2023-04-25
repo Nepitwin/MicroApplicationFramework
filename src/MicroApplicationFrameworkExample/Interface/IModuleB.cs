@@ -2,5 +2,5 @@
 
 public interface IModuleB
 {
-    public void Bar();
+    public string Bar();
 }

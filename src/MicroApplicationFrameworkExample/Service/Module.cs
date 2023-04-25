@@ -1,5 +1,5 @@
-﻿using MicroApplicationFramework.Interface;
-using MicroApplicationFrameworkExample.Interface;
+﻿using MicroApplicationFrameworkExample.Interface;
+using Serilog;
 
 namespace MicroApplicationFrameworkExample.Service;
 
@@ -7,11 +7,11 @@ public class Module : IModule
 {
     public Module()
     {
-        Console.WriteLine("Module INIT");
+        Log.Information("Module INIT");
     }
 
-    public void Foo()
+    public string Foo()
     {
-        Console.WriteLine("Foo");
+        return "Foo";
     }
 }

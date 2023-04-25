@@ -22,6 +22,7 @@ public class Bootstrapper
         try
         {
             _application.OnRegister();
+            _application.NotifyOnRegisterFinished();
             _application.OnInit();
             _application.OnExecute();
             _application.OnExecuteAsync().Wait();

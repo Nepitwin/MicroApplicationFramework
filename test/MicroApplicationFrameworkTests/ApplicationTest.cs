@@ -1,5 +1,8 @@
+using DryIoc;
 using FluentAssertions;
 using MicroApplicationFramework;
+using MicroApplicationFrameworkExample;
+using MicroApplicationFrameworkExample.Interface;
 using Moq;
 using Serilog;
 using Serilog.Sinks.TestCorrelator;
@@ -8,25 +11,6 @@ namespace MicroApplicationFrameworkTests
 {
     public class TestApplication : Application
     {
-        public override void OnRegister()
-        {
-            // Ignored
-        }
-
-        public override void OnInit()
-        {
-            // Ignored
-        }
-
-        public override void OnExecute()
-        {
-            // Ignored
-        }
-
-        public override void OnExit()
-        {
-            // Ignored
-        }
     }
     
     public class ApplicationTest
@@ -54,7 +38,7 @@ namespace MicroApplicationFrameworkTests
         public void OnExitIsAlwaysCalledFromApplicationIfOnRegisterThrowsException()
         {
             var mockApplication = new Mock<TestApplication>();
-            mockApplication.Setup(app => app.OnRegister()).Throws(new Exception("Any Exception By Init"));
+            mockApplication.Setup(app => app.OnRegister()).Throws(new Exception("Any Exception By Register"));
             mockApplication.CallBase = true;
 
             using (InitLoggerContext())
@@ -65,10 +49,11 @@ namespace MicroApplicationFrameworkTests
                 mockApplication.Verify(app => app.OnExecute(), Times.Never);
                 mockApplication.Verify(app => app.OnExecuteAsync(), Times.Never);
                 mockApplication.Verify(app => app.OnExit(), Times.Once);
-                TestCorrelator.GetLogEventsFromCurrentContext()
-                    .Should().ContainSingle()
-                    .Which.MessageTemplate.Text
-                    .Should().Be("Exception called");
+
+                var logs = TestCorrelator.GetLogEventsFromCurrentContext().ToArray();
+                logs.Should().Contain(log => log.MessageTemplate.Text == "Exception called" &&
+                                             log.Exception != null
+                                             && log.Exception.Message == "Any Exception By Register");
             }
         }
 
@@ -87,10 +72,12 @@ namespace MicroApplicationFrameworkTests
                 mockApplication.Verify(app => app.OnExecute(), Times.Never);
                 mockApplication.Verify(app => app.OnExecuteAsync(), Times.Never);
                 mockApplication.Verify(app => app.OnExit(), Times.Once);
-                TestCorrelator.GetLogEventsFromCurrentContext()
-                    .Should().ContainSingle()
-                    .Which.MessageTemplate.Text
-                    .Should().Be("Exception called");
+
+                var logs = TestCorrelator.GetLogEventsFromCurrentContext().ToArray();
+                logs.Should().Contain(log => log.MessageTemplate.Text == "Exception called" && 
+                                             log.Exception != null 
+                                             && log.Exception.Message == "Any Exception By Init");
+
             }
         }
 
@@ -98,7 +85,7 @@ namespace MicroApplicationFrameworkTests
         public void OnExitIsAlwaysCalledFromApplicationIfOnExecuteThrowsException()
         {
             var mockApplication = new Mock<TestApplication>();
-            mockApplication.Setup(app => app.OnExecute()).Throws(new Exception("Any Exception By Init"));
+            mockApplication.Setup(app => app.OnExecute()).Throws(new Exception("Any Exception By OnExecute"));
             mockApplication.CallBase = true;
 
             using (InitLoggerContext())
@@ -109,10 +96,11 @@ namespace MicroApplicationFrameworkTests
                 mockApplication.Verify(app => app.OnExecute(), Times.Once);
                 mockApplication.Verify(app => app.OnExecuteAsync(), Times.Never);
                 mockApplication.Verify(app => app.OnExit(), Times.Once);
-                TestCorrelator.GetLogEventsFromCurrentContext()
-                    .Should().ContainSingle()
-                    .Which.MessageTemplate.Text
-                    .Should().Be("Exception called");
+
+                var logs = TestCorrelator.GetLogEventsFromCurrentContext().ToArray();
+                logs.Should().Contain(log => log.MessageTemplate.Text == "Exception called" &&
+                                             log.Exception != null
+                                             && log.Exception.Message == "Any Exception By OnExecute");
             }
         }
         
@@ -120,7 +108,7 @@ namespace MicroApplicationFrameworkTests
         public void OnExitIsAlwaysCalledFromApplicationIfOnExecuteAsyncThrowsException()
         {
             var mockApplication = new Mock<TestApplication>();
-            mockApplication.Setup(app => app.OnExecuteAsync()).Throws(new Exception("Any Exception By Init"));
+            mockApplication.Setup(app => app.OnExecuteAsync()).Throws(new Exception("Any Exception By OnExecuteAsync"));
             mockApplication.CallBase = true;
 
             using (InitLoggerContext())
@@ -131,10 +119,38 @@ namespace MicroApplicationFrameworkTests
                 mockApplication.Verify(app => app.OnExecute(), Times.Once);
                 mockApplication.Verify(app => app.OnExecuteAsync(), Times.Once);
                 mockApplication.Verify(app => app.OnExit(), Times.Once);
-                TestCorrelator.GetLogEventsFromCurrentContext()
-                    .Should().ContainSingle()
-                    .Which.MessageTemplate.Text
-                    .Should().Be("Exception called");
+
+                var logs = TestCorrelator.GetLogEventsFromCurrentContext().ToArray();
+                logs.Should().Contain(log => log.MessageTemplate.Text == "Exception called" &&
+                                             log.Exception != null
+                                             && log.Exception.Message == "Any Exception By OnExecuteAsync");
+            }
+        }
+
+        [Fact] 
+        public void ContainerElementCanBeOverrideToMockResults()
+        {
+            using (InitLoggerContext())
+            {
+                var app = new App();
+
+                app.OnRegisterFinishedEventHandler += container =>
+                {
+                    // Replace service results by mocking
+                    var mockModule = new Mock<IModule>();
+                    mockModule.Setup(mock => mock.Foo()).Returns("mockbar");
+                    var mockBModule = new Mock<IModuleB>();
+                    mockBModule.Setup(mock => mock.Bar()).Returns("mockfoo");
+
+                    container.RegisterInstance(mockModule.Object, IfAlreadyRegistered.Replace);
+                    container.RegisterInstance(mockBModule.Object, IfAlreadyRegistered.Replace);
+                };
+
+                Bootstrapper.Create(app).Run();
+
+                var logs = TestCorrelator.GetLogEventsFromCurrentContext().ToArray();
+                logs.Should().Contain(log => log.MessageTemplate.Text == "mockbar");
+                logs.Should().Contain(log => log.MessageTemplate.Text == "mockfoo");
             }
         }
 

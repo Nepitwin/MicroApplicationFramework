@@ -1,4 +1,5 @@
 ﻿using MicroApplicationFrameworkExample.Interface;
+using Serilog;
 
 namespace MicroApplicationFrameworkExample.Service;
 
@@ -8,13 +9,12 @@ public class ModuleB : IModuleB
 
     public ModuleB(IModule module)
     {
-        Console.WriteLine("ModuleB INIT");
+        Log.Information("ModuleB INIT");
         _module = module;
     }
 
-    public void Bar()
+    public string Bar()
     {
-        _module.Foo();
-        Console.WriteLine("Bar");
+        return _module.Foo() + " Bar";
     }
 }

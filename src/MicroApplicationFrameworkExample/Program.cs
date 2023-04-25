@@ -1,12 +1,17 @@
 ﻿using MicroApplicationFramework;
 using MicroApplicationFrameworkExample;
+using Serilog;
 
-Console.WriteLine("----------------");
-Console.WriteLine("Sync App");
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateLogger();
+
+Log.Information("----------------");
+Log.Information("Sync App");
 Bootstrapper.Create(new App()).Run();
-Console.WriteLine("----------------");
+Log.Information("----------------");
 
-Console.WriteLine("----------------");
-Console.WriteLine("Async App");
+Log.Information("----------------");
+Log.Information("Async App");
 Bootstrapper.Create(new AsyncApp()).Run();
-Console.WriteLine("----------------");
+Log.Information("----------------");

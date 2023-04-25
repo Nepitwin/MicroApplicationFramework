@@ -7,9 +7,17 @@ namespace MicroApplicationFramework
     {
         public IContainer Container { get; }
 
+        public event OnRegisterFinished? OnRegisterFinishedEventHandler;
+        public delegate void OnRegisterFinished(IContainer container);
+
         protected Application()
         {
             Container = new Container();
+        }
+
+        public void NotifyOnRegisterFinished()
+        {
+            OnRegisterFinishedEventHandler?.Invoke(Container);
         }
 
         public virtual void OnRegister()
@@ -30,7 +38,10 @@ namespace MicroApplicationFramework
         public virtual Task OnExecuteAsync()
         {
             // Ignored
-            return Task.Run(() => {});
+            return Task.Run(() =>
+            {
+                // Ignored
+            });
         }
 
         public virtual void OnExit()

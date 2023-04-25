@@ -2,6 +2,7 @@
 using MicroApplicationFramework;
 using MicroApplicationFrameworkExample.Interface;
 using MicroApplicationFrameworkExample.Service;
+using Serilog;
 
 namespace MicroApplicationFrameworkExample;
 
@@ -9,30 +10,28 @@ public class AsyncApp: Application
 {
     public override void OnRegister()
     {
-        base.OnRegister();
-        Console.WriteLine("OnRegister");
+        Log.Information("OnRegister");
         Container.Register<IModule, Module>(Reuse.Singleton);
         Container.Register<IModuleB, ModuleB>(Reuse.Singleton);
     }
 
     public override void OnInit()
     {
-        base.OnInit();
-        Console.WriteLine("OnInit");
+        Log.Information("OnInit");
     }
 
     public override Task OnExecuteAsync()
     {
-        Console.WriteLine("OnExecuteAsync");
+        Log.Information("OnExecuteAsync");
         return Task.Run(async () =>
         {
             var module = Container.Resolve<IModule>();
             var moduleB = Container.Resolve<IModuleB>();
 
             // Write your async logic code here ...
-            module.Foo();
+            Log.Information(module.Foo());
             await Task.Delay(2500);
-            moduleB.Bar();
+            Log.Information(moduleB.Bar());
 
             // OnExit will be called if all task is finished
         });
@@ -40,7 +39,6 @@ public class AsyncApp: Application
 
     public override void OnExit()
     {
-        Console.WriteLine("OnExit");
-        base.OnExit();
+        Log.Information("OnExit");
     }
 }

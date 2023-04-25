@@ -2,5 +2,5 @@
 
 public interface IModule
 {
-    public void Foo();
+    public string Foo();
 }

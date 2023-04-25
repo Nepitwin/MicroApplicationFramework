@@ -2,6 +2,7 @@
 using MicroApplicationFramework;
 using MicroApplicationFrameworkExample.Interface;
 using MicroApplicationFrameworkExample.Service;
+using Serilog;
 
 namespace MicroApplicationFrameworkExample;
 
@@ -9,34 +10,29 @@ public class App : Application
 {
     public override void OnRegister()
     {
-        base.OnRegister();
-        Console.WriteLine("OnRegister");
+        Log.Information("OnRegister");
         Container.Register<IModule, Module>(Reuse.Singleton);
         Container.Register<IModuleB, ModuleB>(Reuse.Singleton);
     }
 
     public override void OnInit()
     {
-        base.OnInit();
-        Console.WriteLine("OnInit");
+        Log.Information("OnInit");
     }
 
     public override void OnExecute()
     {
-        base.OnExecute();
-        
-        Console.WriteLine("OnExecute");
+        Log.Information("OnExecute");
         var module = Container.Resolve<IModule>();
         var moduleB = Container.Resolve<IModuleB>();
 
         // Write your logic code here ...
-        module.Foo();
-        moduleB.Bar();
+        Log.Information(module.Foo());
+        Log.Information(moduleB.Bar());
     }
 
     public override void OnExit()
     {
-        Console.WriteLine("OnExit");
-        base.OnExit();
+        Log.Information("OnExit");
     }
 }
